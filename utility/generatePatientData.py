@@ -90,10 +90,6 @@ def generate_data(num_patients, output_dir, seed):
         elif row["bmi"] >= 30:
             risk += 1
 
-        # Diabetes (if glucose >= 126 mg/dL)
-        if row["glucose"] >= 126:
-            risk += 2  # Strong independent risk factor
-
         return risk
 
 

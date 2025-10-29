@@ -13,7 +13,7 @@ if __name__ == "__main__":
     system.predict_patient(1)
     system.predict_patient(2)
 
-    new_data = [300, 175, 25, 500, 1]
+    new_data = [100, 100, 25, 105.2, 20]
     system.update_patient(1, new_data)
 
     system.predict_patient(1)
