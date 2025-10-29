@@ -5,8 +5,6 @@ from treeUtility import node
 # DECISION TREE CLASS
 class DecisionTree:
     """
-    A simple Decision Tree Classifier built from scratch using entropy (information gain).
-
     Parameters:
       - min_samples_split: minimum number of samples to attempt a split
       - max_depth: maximum depth allowed for recursion
@@ -97,7 +95,7 @@ class DecisionTree:
 
     def traverse(self, x, node):
         """Traverse the tree recursively for prediction."""
-        if node.is_leaf_node():
+        if node.value is not None:
             return node.value
         if x[node.feature] <= node.threshold:
             return self.traverse(x, node.left)

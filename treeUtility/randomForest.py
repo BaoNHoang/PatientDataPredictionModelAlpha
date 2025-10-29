@@ -39,3 +39,4 @@ class RandomForest:
         tree_predictions = np.array([tree.predict(X) for tree in self.trees])
         tree_predictions = np.swapaxes(tree_predictions, 0, 1) 
         return np.array([self.common_label(preds) for preds in tree_predictions])
+    

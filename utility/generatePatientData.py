@@ -38,7 +38,7 @@ def generate_data(num_patients, output_dir, seed):
         "bmi": bmi.round(1),
     })
 
-    # CREATE LABELS (DISEASE OUTCOMES)
+    # CREATE LABELS (Sickness Results)
     def disease_risk(row):
         risk = 0
         if row["cholesterol"] > 240: risk += 2
@@ -77,7 +77,6 @@ def generate_data(num_patients, output_dir, seed):
     patients_df.to_csv(patients_path, index=False)
     labels_df.to_csv(labels_path, index=False)
 
-    print(f"✅ Created {patients_path} and {labels_path} with {num_patients} records.")
+    print(f"Created {patients_path} and {labels_path} with {num_patients} records.")
 
     return patients_df, labels_df
-

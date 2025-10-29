@@ -2,7 +2,6 @@
 class Node:
     """
     A single node in a decision tree.
-
     Each node represents a condition (feature + threshold).
     Leaf nodes store a final prediction value (class label).
     """
@@ -12,8 +11,3 @@ class Node:
         self.left = left                # Left child node
         self.right = right              # Right child node
         self.value = value              # Class label if leaf node
-
-    def is_leaf_node(self):
-        """Return True if this node is a leaf node."""
-        return self.value is not None
-
