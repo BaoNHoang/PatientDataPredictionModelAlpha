@@ -3,10 +3,10 @@ import utility.generatePatientData as GPD
 
 if __name__ == "__main__":
 
-    patients, labels = GPD.generate_data(num_patients=10, output_dir="data", seed=1)
+    patients, labels = GPD.generate_data(num_patients=100, output_dir="data", seed=1)
 
-    # print(patients.head(10))
-    # print(labels.head(10))
+    print(patients.head(10))
+    print(labels.head(10))
 
     system = PMS.MainModule("./data/patients.csv", "./data/labels.csv")
 

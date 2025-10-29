@@ -34,21 +34,21 @@ class DecisionTree:
             leaf_value = self.common_label(y)
             return node.Node(value=leaf_value)
 
-        feat_idxs = np.random.choice(n_features, self.n_features, replace=False)
+        ft_indexes = np.random.choice(n_features, self.n_features, replace=False)
 
         best_gain = -1
         best_feature = None
         best_threshold = None
 
-        for feat_idx in feat_idxs:
-            X_column = X[:, feat_idx]
+        for index in ft_indexes:
+            X_column = X[:, index]
             thresholds = np.unique(X_column)
 
             for threshold in thresholds:
                 IG = self.information_gain(y, X_column, threshold)
                 if IG > best_gain:
                     best_gain = IG
-                    best_feature = feat_idx
+                    best_feature = index
                     best_threshold = threshold
 
         left_idxs, right_idxs = self.split(X[:, best_feature], best_threshold)
@@ -60,7 +60,7 @@ class DecisionTree:
 
     def information_gain(self, y, X_column, threshold):
         """Compute information gain based on entropy."""
-        parent_entropy = self.calculate_entropy(y)
+        main_entropy = self.calculate_entropy(y)
         left_idxs, right_idxs = self.split(X_column, threshold)
 
         if len(left_idxs) == 0 or len(right_idxs) == 0:
@@ -69,9 +69,9 @@ class DecisionTree:
         n = len(y)
         n_left, n_right = len(left_idxs), len(right_idxs)
         e_left, e_right = self.calculate_entropy(y[left_idxs]), self.calculate_entropy(y[right_idxs])
-        child_entropy = (n_left / n) * e_left + (n_right / n) * e_right
+        sub_entropy = (n_left / n) * e_left + (n_right / n) * e_right
 
-        return parent_entropy - child_entropy
+        return main_entropy - sub_entropy
 
     def split(self, X_column, split_threshold):
         """Split dataset based on threshold."""
@@ -81,8 +81,7 @@ class DecisionTree:
 
     def calculate_entropy(self, y):
         """Calculate entropy of label distribution."""
-        hist = np.bincount(y)
-        ps = hist / len(y)
+        ps = np.bincount(y) / len(y)
         return -np.sum([p * np.log(p) for p in ps if p > 0])
 
     def common_label(self, y):

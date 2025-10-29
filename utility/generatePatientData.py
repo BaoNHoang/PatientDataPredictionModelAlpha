@@ -23,11 +23,11 @@ def generate_data(num_patients, output_dir, seed):
     # CREATE PATIENT FEATURES
     patient_ids = np.arange(1, num_patients + 1)
 
-    cholesterol = np.random.normal(loc=200, scale=30, size=num_patients).clip(120, 280)
-    blood_pressure = np.random.normal(loc=130, scale=20, size=num_patients).clip(100, 180)
+    cholesterol = np.random.normal(loc=200, scale=30, size=num_patients)
+    blood_pressure = np.random.normal(loc=130, scale=20, size=num_patients)
     age = np.random.randint(20, 80, size=num_patients)
-    glucose = np.random.normal(loc=100, scale=25, size=num_patients).clip(70, 200)
-    bmi = np.random.normal(loc=26, scale=5, size=num_patients).clip(18, 40)
+    glucose = np.random.normal(loc=100, scale=25, size=num_patients)
+    bmi = np.random.normal(loc=26, scale=5, size=num_patients)
 
     patients_df = pd.DataFrame({
         "patient_id": patient_ids,
