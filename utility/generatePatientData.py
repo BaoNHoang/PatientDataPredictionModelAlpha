@@ -31,11 +31,11 @@ def generate_data(num_patients, output_dir, seed):
 
     patients_df = pd.DataFrame({
         "patient_id": patient_ids,
-        "cholesterol": cholesterol.astype(int),
-        "blood_pressure": blood_pressure.astype(int),
+        "cholesterol": cholesterol.round(2),
+        "blood_pressure": blood_pressure.round(2),
         "age": age,
-        "glucose": glucose.astype(int),
-        "bmi": bmi.round(1),
+        "glucose": glucose.round(2),
+        "bmi": bmi.round(2),
     })
 
     # CREATE LABELS (Sickness Results)

@@ -1,1 +1,1 @@
-    print(patients.head(10))
+300, 175, 25, 500, 1
