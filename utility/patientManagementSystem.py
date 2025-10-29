@@ -14,7 +14,7 @@ class MainModule:
         self.patient_csv = patient_csv
         self.label_csv = label_csv
         self.X, self.y_dict = self.load_data()
-        self.models = {year: randomForest.RandomForest(n_trees=5, max_depth=5) for year in self.y_dict}
+        self.models = {year: randomForest.RandomForest(n_trees=20, max_depth=10) for year in self.y_dict}
         self.train_all()
 
     def load_data(self):

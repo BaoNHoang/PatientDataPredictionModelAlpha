@@ -18,16 +18,22 @@ def generate_data(num_patients, output_dir, seed):
             (patients_df, labels_df)
     """
 
-    np.random.seed(seed)  # Seed for reproducing data 
+    rng = np.random.default_rng(seed)
 
-    # CREATE PATIENT FEATURES
     patient_ids = np.arange(1, num_patients + 1)
 
-    cholesterol = np.random.normal(loc=200, scale=30, size=num_patients)
-    blood_pressure = np.random.normal(loc=130, scale=20, size=num_patients)
-    age = np.random.randint(20, 80, size=num_patients)
-    glucose = np.random.normal(loc=100, scale=25, size=num_patients)
-    bmi = np.random.normal(loc=26, scale=5, size=num_patients)
+    age = rng.integers(20, 80, size=num_patients)
+    cholesterol = rng.normal(loc=180 + (age-20)*0.5, scale=25, size=num_patients)
+    cholesterol = np.clip(cholesterol, 120, 320)
+
+    blood_pressure = rng.normal(loc=110 + (age-20)*0.6, scale=15, size=num_patients)
+    blood_pressure = np.clip(blood_pressure, 90, 200)
+
+    glucose = rng.normal(loc=95 + (age-20)*0.3, scale=20, size=num_patients)
+    glucose = np.clip(glucose, 70, 300)
+
+    bmi = rng.normal(loc=25 + (age-20)*0.05, scale=4, size=num_patients)
+    bmi = np.clip(bmi, 16, 50)
 
     patients_df = pd.DataFrame({
         "patient_id": patient_ids,
@@ -40,26 +46,82 @@ def generate_data(num_patients, output_dir, seed):
 
     # CREATE LABELS (Sickness Results)
     def disease_risk(row):
+        """
+        Calculates a cardiovascular risk score based on common clinical metrics.
+        Returns a risk score from 0 (low) to ~10 (high).
+        """
         risk = 0
-        if row["cholesterol"] > 240: risk += 2
-        if row["blood_pressure"] > 150: risk += 2
-        if row["glucose"] > 140: risk += 2
-        if row["bmi"] > 30: risk += 1
-        if row["age"] > 50: risk += 1
+
+        # Age
+        if row["age"] >= 65:
+            risk += 3
+        elif row["age"] >= 55:
+            risk += 2
+        elif row["age"] >= 45:
+            risk += 1
+
+        # Cholesterol (mg/dL)
+        if row["cholesterol"] >= 240:
+            risk += 3
+        elif row["cholesterol"] >= 200:
+            risk += 2
+        elif row["cholesterol"] >= 180:
+            risk += 1
+
+        # Blood pressure (systolic)
+        if row["blood_pressure"] >= 160:
+            risk += 3
+        elif row["blood_pressure"] >= 140:
+            risk += 2
+        elif row["blood_pressure"] >= 120:
+            risk += 1
+
+        # Glucose (mg/dL)
+        if row["glucose"] >= 200:
+            risk += 3
+        elif row["glucose"] >= 140:
+            risk += 2
+        elif row["glucose"] >= 100:
+            risk += 1
+
+        # BMI
+        if row["bmi"] >= 35:
+            risk += 2
+        elif row["bmi"] >= 30:
+            risk += 1
+
+        # Diabetes (if glucose >= 126 mg/dL)
+        if row["glucose"] >= 126:
+            risk += 2  # Strong independent risk factor
+
         return risk
+
 
     risks = patients_df.apply(disease_risk, axis=1)
 
     def assign_disease(risk, modifier=0):
-        prob = np.clip(risk + modifier + np.random.normal(0, 1), 0, 10)
-        if prob < 3:
+        """
+        Assigns a disease category based on risk score.
+        
+        Categories:
+        0 - Healthy
+        1 - Diabetes
+        2 - Heart Disease
+        3 - Lung Disease
+        """
+        # Add some random variation
+        prob = np.clip(risk + modifier + np.random.normal(0, 1), 0, 14)
+        
+        # Adjust thresholds to match new risk range
+        if prob < 4:
             return 0  # Healthy
-        elif prob < 5:
-            return 1  # Diabetes
         elif prob < 7:
+            return 1  # Diabetes
+        elif prob < 10:
             return 2  # Heart Disease
         else:
             return 3  # Lung Disease
+
 
     labels_df = pd.DataFrame({
         "patient_id": patient_ids,
