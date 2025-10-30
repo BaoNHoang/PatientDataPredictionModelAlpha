@@ -2,6 +2,9 @@
 venv/
 .env/
 
+# Models
+models/
+
 # Python cache
 __pycache__/
 *.py[cod]

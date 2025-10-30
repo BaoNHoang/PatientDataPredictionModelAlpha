@@ -1,8 +1,10 @@
+# generatePatientData.py
 import pandas as pd
 import numpy as np
 import os
 
-def generate_data(num_patients, output_dir, seed):
+# CREATE DATA (Sickness Results)
+def generate_data(num_patients, output_dir, seed=None):
     """
     Generate realistic dummy patient data and disease progression labels.
     
@@ -95,6 +97,7 @@ def generate_data(num_patients, output_dir, seed):
 
     risks = patients_df.apply(disease_risk, axis=1)
 
+    # ASSIGN DISEASE 
     def assign_disease(risk, modifier=0):
         """
         Assigns a disease category based on risk score.
@@ -105,10 +108,8 @@ def generate_data(num_patients, output_dir, seed):
         2 - Heart Disease
         3 - Lung Disease
         """
-        # Add some random variation
         prob = np.clip(risk + modifier + np.random.normal(0, 1), 0, 14)
         
-        # Adjust thresholds to match new risk range
         if prob < 4:
             return 0  # Healthy
         elif prob < 7:
@@ -127,7 +128,7 @@ def generate_data(num_patients, output_dir, seed):
         "10-year": [assign_disease(r, 3) for r in risks],
     })
 
-    #  SAVE TO FILES
+    # SAVE TO FILES
     os.makedirs(output_dir, exist_ok=True)
     patients_path = os.path.join(output_dir, "patients.csv")
     labels_path = os.path.join(output_dir, "labels.csv")
