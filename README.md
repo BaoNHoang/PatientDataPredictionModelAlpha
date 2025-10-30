@@ -26,6 +26,12 @@ The system:
 ├── data/
 │ ├── patients.csv
 │ ├── labels.csv
+│ 
+├── models/
+│ ├── 1-year_model.pkl
+│ ├── 2-year_model.pkl
+| ├── 5-year_model.pkl
+| ├── 10-year_model.pkl
 │
 ├── treeUtility/
 │ ├── node.py
