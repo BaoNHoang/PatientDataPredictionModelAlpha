@@ -1,0 +1,550 @@
+# node.py 
+# NODE CLASS — basic unit of a decision tree
+class Node:
+    """
+    A single node in a decision tree.
+    Each node represents a condition (feature + threshold).
+    Leaf nodes store a final prediction value (class label).
+    """
+    def __init__(self, feature=None, threshold=None, left=None, right=None, *, value=None):
+        self.feature = feature          # Index of the feature used for splitting
+        self.threshold = threshold      # Threshold value for the feature
+        self.left = left                # Left child node
+        self.right = right              # Right child node
+        self.value = value              # Class label if leaf node
+# decisionTree.py
+import numpy as np
+from collections import Counter
+from treeUtility import node
+
+# DECISION TREE CLASS
+class DecisionTree:
+    """
+    Parameters:
+      - min_samples_split: minimum number of samples to attempt a split
+      - max_depth: maximum depth allowed for recursion
+      - n_features: number of random features to consider at each split (used for randomness)
+    """
+    def __init__(self, min_samples_split=2, max_depth=100, n_features=None):
+        self.min_samples_split = min_samples_split
+        self.max_depth = max_depth
+        self.n_features = n_features
+        self.root = None 
+
+    def fit(self, X, y):
+        """
+        Fit (train) the decision tree using dataset X (features) and y (labels).
+        """
+        self.n_features = X.shape[1] if self.n_features is None else min(X.shape[1], self.n_features)
+        self.root = self.grow_tree(X, y)
+
+    def grow_tree(self, X, y, depth=0):
+        """
+        Recursively grow the decision tree and determine the best split at each node.
+        """
+        n_samples, n_features = X.shape
+        n_labels = len(np.unique(y))
+
+        if (depth >= self.max_depth or n_labels == 1 or n_samples < self.min_samples_split):
+            leaf_value = self.common_label(y)
+            return node.Node(value=leaf_value)
+
+        ft_indexes = np.random.choice(n_features, self.n_features, replace=False)
+
+        best_gain = -1
+        best_feature = None
+        best_threshold = None
+
+        for index in ft_indexes:
+            X_column = X[:, index]
+            thresholds = np.unique(X_column)
+
+            for threshold in thresholds:
+                IG = self.information_gain(y, X_column, threshold)
+                if IG > best_gain:
+                    best_gain = IG
+                    best_feature = index
+                    best_threshold = threshold
+
+        left_idxs, right_idxs = self.split(X[:, best_feature], best_threshold)
+
+        left_child = self.grow_tree(X[left_idxs, :], y[left_idxs], depth + 1)
+        right_child = self.grow_tree(X[right_idxs, :], y[right_idxs], depth + 1)
+
+        return node.Node(feature=best_feature, threshold=best_threshold, left=left_child, right=right_child)
+
+    def information_gain(self, y, X_column, threshold):
+        """Compute information gain based on entropy."""
+        main_entropy = self.calculate_entropy(y)
+        left_idxs, right_idxs = self.split(X_column, threshold)
+
+        if len(left_idxs) == 0 or len(right_idxs) == 0:
+            return 0
+
+        n = len(y)
+        n_left, n_right = len(left_idxs), len(right_idxs)
+        e_left, e_right = self.calculate_entropy(y[left_idxs]), self.calculate_entropy(y[right_idxs])
+        sub_entropy = (n_left / n) * e_left + (n_right / n) * e_right
+
+        return main_entropy - sub_entropy
+
+    def split(self, X_column, split_threshold):
+        """Split dataset based on threshold."""
+        left_idxs = np.argwhere(X_column <= split_threshold).flatten()
+        right_idxs = np.argwhere(X_column > split_threshold).flatten()
+        return left_idxs, right_idxs
+
+    def calculate_entropy(self, y):
+        """Calculate entropy of label distribution."""
+        ps = np.bincount(y) / len(y)
+        return -np.sum([p * np.log(p) for p in ps if p > 0])
+
+    def common_label(self, y):
+        """Return most frequent class label."""
+        return Counter(y).most_common(1)[0][0]
+
+    def predict(self, X):
+        """Predict class labels for all samples in X."""
+        return np.array([self.traverse(x, self.root) for x in X])
+
+    def traverse(self, x, node):
+        """Traverse the tree recursively for prediction."""
+        if node.value is not None:
+            return node.value
+        if x[node.feature] <= node.threshold:
+            return self.traverse(x, node.left)
+        else:
+            return self.traverse(x, node.right)
+# randomForest.py
+import numpy as np
+from collections import Counter
+from treeUtility import decisionTree
+
+# RANDOM FOREST CLASS 
+class RandomForest:
+    """
+    Random Forest — collection of Decision Trees.
+    Improves stability and accuracy using bootstrap sampling.
+    """
+    def __init__(self, n_trees=10, max_depth=10, min_samples_split=2, n_features=None):
+        self.n_trees = n_trees
+        self.max_depth = max_depth
+        self.min_samples_split = min_samples_split
+        self.n_features = n_features
+        self.trees = []
+
+    def fit(self, X, y):
+        """Train multiple trees on random bootstrap samples."""
+        self.trees = []
+        for _ in range(self.n_trees):
+            tree = decisionTree.DecisionTree(max_depth=self.max_depth, min_samples_split=self.min_samples_split, n_features=self.n_features)
+            X_sample, y_sample = self.randomized_samples(X, y)
+            tree.fit(X_sample, y_sample)
+            self.trees.append(tree)
+
+    def randomized_samples(self, X, y):
+        """Randomly sample with replacement with boostrap sampling."""
+        n_samples = X.shape[0]
+        idxs = np.random.choice(n_samples, n_samples, replace=True)
+        return X[idxs], y[idxs]
+
+    def common_label(self, y):
+        """Return the most common label in predictions."""
+        return Counter(y).most_common(1)[0][0]
+
+    def predict(self, X):
+        """Predict using majority vote from all trees."""
+        tree_predictions = np.array([tree.predict(X) for tree in self.trees])
+        tree_predictions = np.swapaxes(tree_predictions, 0, 1) 
+        return np.array([self.common_label(preds) for preds in tree_predictions])
+    # generatePatientData.py
+import pandas as pd
+import numpy as np
+import os
+
+# CREATE DATA (Sickness Results)
+def generate_data(num_patients, output_dir, seed=None):
+    """
+    Generate realistic dummy patient data and disease progression labels.
+    
+    Args:
+        num_patients (int): Number of patients to simulate (default=500)
+        output_dir (str): Directory to save the CSV files (default=current folder)
+        
+    Output:
+        Creates:
+            - patients.csv
+            - labels.csv
+        Returns:
+            (patients_df, labels_df)
+    """
+
+    rng = np.random.default_rng(seed)
+
+    patient_ids = np.arange(1, num_patients + 1)
+
+    age = rng.integers(20, 80, size=num_patients)
+    cholesterol = rng.normal(loc=180 + (age-20)*0.5, scale=25, size=num_patients)
+    cholesterol = np.clip(cholesterol, 120, 320)
+
+    blood_pressure = rng.normal(loc=110 + (age-20)*0.6, scale=15, size=num_patients)
+    blood_pressure = np.clip(blood_pressure, 90, 200)
+
+    glucose = rng.normal(loc=95 + (age-20)*0.3, scale=20, size=num_patients)
+    glucose = np.clip(glucose, 70, 300)
+
+    bmi = rng.normal(loc=25 + (age-20)*0.05, scale=4, size=num_patients)
+    bmi = np.clip(bmi, 16, 50)
+
+    patients_df = pd.DataFrame({
+        "patient_id": patient_ids,
+        "cholesterol": cholesterol.round(2),
+        "blood_pressure": blood_pressure.round(2),
+        "age": age,
+        "glucose": glucose.round(2),
+        "bmi": bmi.round(2),
+    })
+
+    # CREATE LABELS (Sickness Results)
+    def disease_risk(row):
+        """
+        Calculates a cardiovascular risk score based on common clinical metrics.
+        Returns a risk score from 0 (low) to ~10 (high).
+        """
+        risk = 0
+
+        # Age
+        if row["age"] >= 65:
+            risk += 3
+        elif row["age"] >= 55:
+            risk += 2
+        elif row["age"] >= 45:
+            risk += 1
+
+        # Cholesterol (mg/dL)
+        if row["cholesterol"] >= 240:
+            risk += 3
+        elif row["cholesterol"] >= 200:
+            risk += 2
+        elif row["cholesterol"] >= 180:
+            risk += 1
+
+        # Blood pressure (systolic)
+        if row["blood_pressure"] >= 160:
+            risk += 3
+        elif row["blood_pressure"] >= 140:
+            risk += 2
+        elif row["blood_pressure"] >= 120:
+            risk += 1
+
+        # Glucose (mg/dL)
+        if row["glucose"] >= 200:
+            risk += 3
+        elif row["glucose"] >= 140:
+            risk += 2
+        elif row["glucose"] >= 100:
+            risk += 1
+
+        # BMI
+        if row["bmi"] >= 35:
+            risk += 2
+        elif row["bmi"] >= 30:
+            risk += 1
+
+        return risk
+
+
+    risks = patients_df.apply(disease_risk, axis=1)
+
+    # ASSIGN DISEASE 
+    def assign_disease(risk, modifier=0):
+        """
+        Assigns a disease category based on risk score.
+        
+        Categories:
+        0 - Healthy
+        1 - Diabetes
+        2 - Heart Disease
+        3 - Lung Disease
+        """
+        prob = np.clip(risk + modifier + np.random.normal(0, 1), 0, 14)
+        
+        if prob < 4:
+            return 0  # Healthy
+        elif prob < 7:
+            return 1  # Diabetes
+        elif prob < 10:
+            return 2  # Heart Disease
+        else:
+            return 3  # Lung Disease
+
+
+    labels_df = pd.DataFrame({
+        "patient_id": patient_ids,
+        "1-year": [assign_disease(r, 0) for r in risks],
+        "2-year": [assign_disease(r, 1) for r in risks],
+        "5-year": [assign_disease(r, 2) for r in risks],
+        "10-year": [assign_disease(r, 3) for r in risks],
+    })
+
+    # SAVE TO FILES
+    os.makedirs(output_dir, exist_ok=True)
+    patients_path = os.path.join(output_dir, "patients.csv")
+    labels_path = os.path.join(output_dir, "labels.csv")
+
+    patients_df.to_csv(patients_path, index=False)
+    labels_df.to_csv(labels_path, index=False)
+
+    print(f"Created {patients_path} and {labels_path} with {num_patients} records.")
+
+    return patients_df, labels_df
+# patientManagementSystem.py
+import pandas as pd
+import numpy as np
+import joblib
+import os
+from treeUtility import randomForest
+
+# PATIENT MANAGEMENT SYSTEM
+class MainModule:
+    """
+    Patient Disease Prediction System using Random Forest.
+    
+    This module:
+    - Loads patient data and disease progression labels
+    - Splits data into training and testing sets
+    - Trains separate Random Forest models for each time horizon (1, 2, 5, 10 years)
+    - Predicts and updates patient data
+    """
+
+    def __init__(self, patient_csv, label_csv, model_dir="models"):
+            self.patient_csv = patient_csv
+            self.label_csv = label_csv
+            self.model_dir = model_dir
+            os.makedirs(self.model_dir, exist_ok=True)
+
+            self.X, self.y_dict = self.load_data()
+            self.X_train, self.X_test, self.y_train_dict, self.y_test_dict = self.split_all()
+
+            self.models = {}
+            for year in self.y_dict:
+                model_path = os.path.join(self.model_dir, f"{year}_model.pkl")
+                if os.path.exists(model_path):
+                    print(f"Loading saved model for {year}...")
+                    self.models[year] = joblib.load(model_path)
+                else:
+                    print(f"Training new model for {year}...")
+                    model = randomForest.RandomForest(n_trees=150, max_depth=20, min_samples_split=2)
+                    model.fit(self.X_train, self.y_train_dict[year])
+                    joblib.dump(model, model_path)
+                    self.models[year] = model
+
+    def load_data(self):
+        """Load features and labels from CSVs."""
+        patients_df = pd.read_csv(self.patient_csv)
+        labels_df = pd.read_csv(self.label_csv)
+
+        X = patients_df.drop(columns=["patient_id"]).to_numpy()
+        y_dict = {col: labels_df[col].to_numpy() for col in labels_df.columns if col != "patient_id"}
+
+        return X, y_dict
+    
+    def split_all(self, test_size=0.2, random_state=42):
+        """Split features and all label sets into train/test subsets."""
+        n = self.X.shape[0]
+        idx = np.arange(n)
+        np.random.seed(random_state)
+        np.random.shuffle(idx)
+
+        split = int(n * (1 - test_size))
+        train_idx, test_idx = idx[:split], idx[split:]
+
+        X_train, X_test = self.X[train_idx], self.X[test_idx]
+
+        y_train_dict = {k: v[train_idx] for k, v in self.y_dict.items()}
+        y_test_dict = {k: v[test_idx] for k, v in self.y_dict.items()}
+
+        return X_train, X_test, y_train_dict, y_test_dict
+
+    def evaluate(self):
+        """Evaluate model accuracy on unseen test data."""
+
+        print("\nModel Performance on Test Data:")
+        for year, model in self.models.items():
+            y_pred = model.predict(self.X_test)
+            y_true = self.y_test_dict[year]
+            acc = np.mean(y_pred == y_true)
+            print(f"  {year}: {acc * 100:.2f}% accuracy")
+
+    def predict_patient(self, patient_id):
+        """Predict diseases for a single patient across all future years."""
+        patients_df = pd.read_csv(self.patient_csv)
+
+        if patient_id not in patients_df["patient_id"].values:
+            print(f"Patient {patient_id} not found.")
+            return
+
+        patient_row = (patients_df.loc[patients_df["patient_id"] == patient_id].drop(columns=["patient_id"]).to_numpy())
+
+        disease_names = ["Healthy", "Diabetes", "Heart Disease", "Lung Disease"]
+        print(f"\nPredictions for Patient {patient_id}:")
+        print(f"  Current features: {patient_row.tolist()[0]}")
+
+        for year, model in self.models.items():
+            pred = model.predict(patient_row)[0]
+            print(f"  → {year}: {disease_names[pred]}")
+
+    def update_patient(self, patient_id, new_features):
+        """
+        Update patient data and optionally retrain.
+        
+        Args:
+            patient_id (int): Patient ID to update
+            new_features (list): [cholesterol, blood_pressure, age, glucose, bmi]
+        """
+        patients_df = pd.read_csv(self.patient_csv)
+        if patient_id not in patients_df["patient_id"].values:
+            print(f"Patient {patient_id} not found.")
+            return
+
+        feature_cols = patients_df.columns[1:]
+        patients_df.loc[patients_df["patient_id"] == patient_id, feature_cols] = new_features
+        patients_df.to_csv(self.patient_csv, index=False)
+
+        print(f"\nUpdated patient {patient_id} data in CSV.")
+        print(f"   New features: {dict(zip(feature_cols, new_features))}")
+
+        # Reload updated data and retrain (for demo purposes)
+        self.X, self.y_dict = self.load_data()
+        self.X_train, self.X_test, self.y_train_dict, self.y_test_dict = self.split_all()
+        self.train_all()
+
+    def predict_new_patient(self, new_features):
+        """
+        Predict diseases for a brand-new patient (not in the CSV).
+        Args:
+            new_features (list or array): [cholesterol, blood_pressure, age, glucose, bmi]
+        """
+        new_features = np.array(new_features).reshape(1, -1)
+        disease_names = ["Healthy", "Diabetes", "Heart Disease", "Lung Disease"]
+
+        print("\nPredictions for New Patient:")
+        print(f"  Input features: {new_features.tolist()[0]}")
+
+        for year, model in self.models.items():
+            pred = model.predict(new_features)[0]
+            print(f"  → {year}: {disease_names[pred]}")
+
+# main.py
+import utility.patientManagementSystem as PMS
+import utility.generatePatientData as GPD
+
+if __name__ == "__main__":
+    # Step 1: Generate new dummy patient data
+    GPD.generate_data(num_patients=1000, output_dir="data", seed=5)
+
+    file_path = "data/"
+    patient_data = file_path + "patients.csv"
+    label_data =  file_path +"labels.csv"
+    # Step 2: Initialize system
+    system = PMS.MainModule(patient_data, label_data)
+
+    # Step 3: Evaluate on unseen data
+    system.evaluate()
+
+    # Step 4: Predict a few patients
+    system.predict_patient(1)
+    system.predict_patient(10)
+
+    # # Step 5: Update a patient and retrain
+    # new_data = [120, 110, 45, 90, 24.5]
+    # system.update_patient(1, new_data)
+
+    # Step 6: Predict a brand new patient (custom input)
+    new_patient = [150.3, 109.42, 29, 115.43, 28.7]  # cholesterol, blood_pressure, age, glucose, bmi
+    system.predict_new_patient(new_patient)
+
+
+CHANGED to CURRENT
+
+decisionTree.py
+1. New / changed __init__
+def __init__(self, min_samples_split=2, max_depth=100, n_features=None, criterion="gini"):
+
+What changed:
+Added criterion parameter ("gini" or "entropy")
+Added n_features (random feature sampling)
+Default impurity now Gini (faster, common in random forests)
+Why:
+Adds control and randomness which helps avoid overfitting and gives variety among trees.
+
+2. In fit()
+self.n_features = (
+    int(np.sqrt(X.shape[1])) if self.n_features is None else min(X.shape[1], self.n_features)
+)
+
+
+What changed:
+Automatically chooses √(n_features) if not specified.
+Why:
+This mimics scikit-learn’s RandomForest feature selection — randomizes which features each tree considers.
+
+3. Added criterion logic inside information_gain()
+if self.criterion == "entropy":
+    impurity_func = self.entropy
+else:
+    impurity_func = self.gini
+
+What changed:
+You can now switch between Gini or Entropy splits.
+
+4. Added Gini impurity function
+def gini(self, y):
+    ps = np.bincount(y) / len(y)
+    return 1 - np.sum(ps ** 2)
+
+What changed:
+Added a second impurity function option.
+
+randomForest.py 
+1. New imports
+from sklearn.preprocessing import StandardScaler
+
+What changed:
+Added feature scaling for better threshold consistency.
+
+Why:
+If features are on different scales (e.g., “age = 70” vs “cholesterol = 200”), splits can bias toward larger-magnitude features. Scaling fixes that.
+
+2. Updated class signature
+class RandomForest:
+    def __init__(self, n_trees=300, max_depth=25, min_samples_split=4, n_features=None, criterion="gini"):
+
+
+What changed:
+Default n_trees = 300 (more stable)
+Default max_depth = 25 (deeper, but safe)
+Default min_samples_split = 4
+Added criterion and n_features (passes down to DecisionTree)
+Added a StandardScaler
+
+Why:
+These are  strong defaults for general health prediction tasks.
+
+3. Feature scaling added to fit() and predict()
+X = self.scaler.fit_transform(X)
+
+and
+X = self.scaler.transform(X)
+
+Why:
+Ensures all features have mean=0, std=1 — stabilizes splits and improves accuracy, especially when variables are on very different scales.
+
+4. Added criterion forwarding
+tree = decisionTree.DecisionTree(
+    ...
+    criterion=self.criterion
+)
+
+Why:
+Makes every tree use the same splitting rule type (Gini or Entropy).
