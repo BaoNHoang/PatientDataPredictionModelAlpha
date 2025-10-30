@@ -10,7 +10,7 @@ class RandomForest:
     Random Forest — collection of Decision Trees.
     Improves stability and accuracy using bootstrap sampling.
     """
-    def __init__(self, n_trees=300, max_depth=25, min_samples_split=4, n_features=None, criterion="gini"):
+    def __init__(self, n_trees=850, max_depth=30, min_samples_split=2, n_features=None, criterion="gini"):
         self.n_trees = n_trees
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split

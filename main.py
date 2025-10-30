@@ -1,10 +1,14 @@
 # main.py
+import time
 import utility.patientManagementSystem as PMS
 import utility.generatePatientData as GPD
 
 if __name__ == "__main__":
+    
+    start = time.time()
+
     # Step 1: Generate new dummy patient data
-    GPD.generate_data(num_patients=1000, output_dir="data", seed=5)
+    GPD.generate_data(num_patients=500, output_dir="data", seed=0)
 
     file_path = "data/"
     patient_data = file_path + "patients.csv"
@@ -26,3 +30,6 @@ if __name__ == "__main__":
     # Step 6: Predict a brand new patient (custom input)
     new_patient = [150.3, 109.42, 29, 115.43, 28.7]  # cholesterol, blood_pressure, age, glucose, bmi
     system.predict_new_patient(new_patient)
+
+    end = time.time()
+    print(f"\nTime: {end- start:.2f} seconds")

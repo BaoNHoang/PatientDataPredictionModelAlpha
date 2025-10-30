@@ -34,7 +34,7 @@ class MainModule:
                     self.models[year] = joblib.load(model_path)
                 else:
                     print(f"Training new model for {year}...")
-                    model = randomForest.RandomForest(n_trees=150, max_depth=20, min_samples_split=2)
+                    model = randomForest.RandomForest(n_trees=600, max_depth=45, min_samples_split=3, criterion="gini")
                     model.fit(self.X_train, self.y_train_dict[year])
                     joblib.dump(model, model_path)
                     self.models[year] = model
