@@ -112,9 +112,9 @@ def generate_data(num_patients, output_dir, seed=None):
         
         if prob < 4:
             return 0  # Healthy
-        elif prob < 7:
+        elif prob < 8:
             return 1  # Diabetes
-        elif prob < 10:
+        elif prob < 11:
             return 2  # Heart Disease
         else:
             return 3  # Lung Disease

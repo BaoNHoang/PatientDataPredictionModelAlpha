@@ -34,7 +34,7 @@ class MainModule:
                     self.models[year] = joblib.load(model_path)
                 else:
                     print(f"Training new model for {year}...")
-                    model = randomForest.RandomForest(n_trees=600, max_depth=45, min_samples_split=3, criterion="gini")
+                    model = randomForest.RandomForest(n_trees=600, max_depth=40, min_samples_split=3, criterion="gini")
                     model.fit(self.X_train, self.y_train_dict[year])
                     joblib.dump(model, model_path)
                     self.models[year] = model
@@ -127,6 +127,7 @@ class MainModule:
         """
         new_features = np.array(new_features).reshape(1, -1)
         disease_names = ["Healthy", "Diabetes", "Heart Disease", "Lung Disease"]
+        results = {}
 
         print("\nPredictions for New Patient:")
         print(f"  Input features: {new_features.tolist()[0]}")
@@ -134,4 +135,6 @@ class MainModule:
         for year, model in self.models.items():
             pred = model.predict(new_features)[0]
             print(f"  → {year}: {disease_names[pred]}")
+            results[year] = disease_names[pred]
+        return results
 

@@ -8,7 +8,7 @@ if __name__ == "__main__":
     start = time.time()
 
     # Step 1: Generate new dummy patient data
-    GPD.generate_data(num_patients=500, output_dir="data", seed=0)
+    GPD.generate_data(num_patients=10000, output_dir="data", seed=0)
 
     file_path = "data/"
     patient_data = file_path + "patients.csv"
