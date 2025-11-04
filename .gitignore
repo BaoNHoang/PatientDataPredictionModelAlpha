@@ -5,6 +5,10 @@ venv/
 # Models
 models/
 
+# MISC
+test
+commands
+
 # Python cache
 __pycache__/
 *.py[cod]
