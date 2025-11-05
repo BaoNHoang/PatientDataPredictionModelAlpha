@@ -78,7 +78,7 @@ class MainModule:
 
     def predict_patient(self, patient_id):
         """Predict diseases for a single patient across all future years."""
-        patients_df = pd.read_csv(self.patient_csv)
+        patients_df = pd.read_csv("backend/" + self.patient_csv)
 
         if patient_id not in patients_df["patient_id"].values:
             print(f"Patient {patient_id} not found.")
