@@ -17,7 +17,7 @@ class MainModule:
     - Predicts and updates patient data
     """
 
-    def __init__(self, patient_csv, label_csv, model_dir="backend/models"):
+    def __init__(self, patient_csv, label_csv, model_dir="models"):
             self.patient_csv = patient_csv
             self.label_csv = label_csv
             self.model_dir = model_dir
@@ -41,8 +41,9 @@ class MainModule:
 
     def load_data(self):
         """Load features and labels from CSVs."""
-        patients_df = pd.read_csv("backend/" + self.patient_csv)
-        labels_df = pd.read_csv("backend/" + self.label_csv)
+
+        patients_df = pd.read_csv(self.patient_csv)
+        labels_df = pd.read_csv(self.label_csv)
 
         X = patients_df.drop(columns=["patient_id"]).to_numpy()
         y_dict = {col: labels_df[col].to_numpy() for col in labels_df.columns if col != "patient_id"}
@@ -78,7 +79,7 @@ class MainModule:
 
     def predict_patient(self, patient_id):
         """Predict diseases for a single patient across all future years."""
-        patients_df = pd.read_csv("backend/" + self.patient_csv)
+        patients_df = pd.read_csv(self.patient_csv)
 
         if patient_id not in patients_df["patient_id"].values:
             print(f"Patient {patient_id} not found.")
