@@ -1,5 +1,6 @@
 # main.py
 import time
+import os
 import utility.patientManagementSystem as PMS
 import utility.generatePatientData as GPD
 
@@ -8,11 +9,15 @@ if __name__ == "__main__":
     start = time.time()
 
     # Step 1: Generate new dummy patient data
-    GPD.generate_data(num_patients=10000, output_dir="data", seed=0)
+    if not os.path.exists("backend/data/patients.csv") or not os.path.exists("backend/data/labels.csv"):
+            print("Generating new dummy patient data...")
+            GPD.generate_data(num_patients=10000, output_dir="data", seed=0)
+    else:
+        print("Using existing patient data.")
 
-    file_path = "data/"
-    patient_data = file_path + "patients.csv"
-    label_data =  file_path +"labels.csv"
+        file_path = "data/"
+        patient_data = file_path + "patients.csv"
+        label_data = file_path + "labels.csv"
     # Step 2: Initialize system
     system = PMS.MainModule(patient_data, label_data)
 

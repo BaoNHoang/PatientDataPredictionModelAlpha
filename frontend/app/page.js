@@ -122,17 +122,33 @@ export default function Dashboard() {
           </div>
 
           <div className="flex gap-3 mt-4">
-            <button
-              onClick={predictDisease}
-              disabled={loading}
-              className={`${
-                loading
-                  ? "bg-blue-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
-              } text-white px-4 py-2 rounded-lg shadow-md`}
-            >
-              {loading ? "Predicting..." : "Predict"}
-            </button>
+          <button
+            onClick={predictDisease}
+            disabled={loading}
+            className={`flex items-center justify-center gap-2 ${
+              loading
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            } text-white px-4 py-2 rounded-lg shadow-md min-w-[120px]`}
+          >
+            {loading ? (
+              <>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 1,
+                    ease: "linear",
+                  }}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </motion.div>
+                <span>Predicting...</span>
+              </>
+            ) : (
+              "Predict"
+            )}
+          </button>
             <button
               onClick={handleClear}
               className="flex items-center gap-2 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg shadow-md"

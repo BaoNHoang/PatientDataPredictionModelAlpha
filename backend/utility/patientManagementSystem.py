@@ -17,7 +17,7 @@ class MainModule:
     - Predicts and updates patient data
     """
 
-    def __init__(self, patient_csv, label_csv, model_dir="models"):
+    def __init__(self, patient_csv, label_csv, model_dir="backend/models"):
             self.patient_csv = patient_csv
             self.label_csv = label_csv
             self.model_dir = model_dir
@@ -41,8 +41,8 @@ class MainModule:
 
     def load_data(self):
         """Load features and labels from CSVs."""
-        patients_df = pd.read_csv(self.patient_csv)
-        labels_df = pd.read_csv(self.label_csv)
+        patients_df = pd.read_csv("backend/" + self.patient_csv)
+        labels_df = pd.read_csv("backend/" + self.label_csv)
 
         X = patients_df.drop(columns=["patient_id"]).to_numpy()
         y_dict = {col: labels_df[col].to_numpy() for col in labels_df.columns if col != "patient_id"}

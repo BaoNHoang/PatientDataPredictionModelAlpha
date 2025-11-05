@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 # CREATE DATA (Sickness Results)
-def generate_data(num_patients, output_dir, seed=None):
+def generate_data(num_patients, output_dir="backend", seed=None):
     """
     Generate realistic dummy patient data and disease progression labels.
     
@@ -110,11 +110,11 @@ def generate_data(num_patients, output_dir, seed=None):
         """
         prob = np.clip(risk + modifier + np.random.normal(0, 1), 0, 14)
         
-        if prob < 4:
+        if prob < 5:
             return 0  # Healthy
-        elif prob < 8:
+        elif prob < 9:
             return 1  # Diabetes
-        elif prob < 11:
+        elif prob < 12:
             return 2  # Heart Disease
         else:
             return 3  # Lung Disease
@@ -124,8 +124,8 @@ def generate_data(num_patients, output_dir, seed=None):
         "patient_id": patient_ids,
         "1-year": [assign_disease(r, 0) for r in risks],
         "2-year": [assign_disease(r, 1) for r in risks],
-        "5-year": [assign_disease(r, 2) for r in risks],
-        "10-year": [assign_disease(r, 3) for r in risks],
+        "5-year": [assign_disease(r, 3) for r in risks],
+        "10-year": [assign_disease(r, 5) for r in risks],
     })
 
     # SAVE TO FILES

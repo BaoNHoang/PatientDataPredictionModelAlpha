@@ -4,6 +4,7 @@ venv/
 
 # Models
 models/
+data/
 
 # MISC
 test
