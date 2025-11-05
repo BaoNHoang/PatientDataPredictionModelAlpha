@@ -23,27 +23,45 @@ The system:
 ## 📂 Project Structure
 ```
 📦 patient-disease-predictor
+├── backend/
+│   ├── __pycache__/
+│   ├── data/
+│   ├── models/
+│   ├── treeUtility/
+│   │   ├── node.py
+│   │   ├── decisionTree.py
+│   │   ├── randomForest.py
+│   ├── utility/
+│   │   ├── generatePatientData.py
+│   │   ├── patientManagementSystem.py
+│   ├── venv/
+│   ├── api_server.py
+│   ├── api.py
+│   ├── main.py
+│   ├── requirements.txt
+│
 ├── data/
-│ ├── patients.csv
-│ ├── labels.csv
-│ 
-├── models/
-│ ├── 1-year_model.pkl
-│ ├── 2-year_model.pkl
-| ├── 5-year_model.pkl
-| ├── 10-year_model.pkl
+│   ├── patients.csv
+│   ├── labels.csv
 │
-├── treeUtility/
-│ ├── node.py
-│ ├── decisionTree.py
-│ ├── randomForest.py
+├── frontend/
+│   ├── .next/
+│   ├── app/
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   ├── layout.js
+│   │   ├── page.js
+│   ├── node_modules/
+│   ├── public/
+│   ├── .gitignore
+│   ├── eslint.config.mjs
+│   ├── jsconfig.json
+│   ├── next.config.mjs
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.mjs
+│   ├── README.md
 │
-├── utility/
-│ ├── generatePatientData.py
-│ ├── patientManagementSystem.py
-│
-├── main.py
-├── requirements.txt
 └── README.md
 ```
 # 🧰 Tech Stack
