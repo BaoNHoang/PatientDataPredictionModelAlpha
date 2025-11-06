@@ -1,16 +1,6 @@
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
 import { ActivityLogIcon, HeartIcon, PersonIcon } from "@radix-ui/react-icons";
 import { WindIcon, RefreshCw } from "lucide-react"; 
 
@@ -195,26 +185,6 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-
-        {/* ---- Risk Progression Chart ---- */}
-        {/* <div className="bg-gray-100 p-5 rounded-xl shadow-inner">
-          <h2 className="text-xl font-semibold mb-3">Risk Progression Over Time</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={diseaseData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="year" />
-              <YAxis domain={[0, 5]} />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="risk"
-                stroke="#ef4444"
-                activeDot={{ r: 8 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div> */}
       </motion.div>
     </div>
   );
