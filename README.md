@@ -47,10 +47,15 @@ The system:
 ├── frontend/
 │   ├── .next/
 │   ├── app/
+│   │   ├── dashboard/ 
+│   │   │   ├── page.js
+│   │   ├── patients/ 
+│   │   │   ├── page.js
 │   │   ├── favicon.ico
 │   │   ├── globals.css
 │   │   ├── layout.js
 │   │   ├── page.js
+│   │
 │   ├── node_modules/
 │   ├── public/
 │   ├── .gitignore
