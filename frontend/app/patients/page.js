@@ -6,9 +6,9 @@ import { ArrowLeft } from "lucide-react";
 
 export default function PatientsPage() {
   const [patients, setPatients] = useState([
-    { name: "John Doe", age: 45, bmi: 24.5 },
-    { name: "Jane Smith", age: 38, bmi: 27.1 },
-    { name: "Alice Johnson", age: 52, bmi: 30.2 },
+    { name: "Bao Hoang", age: 45, bmi: 24.5 },
+    { name: "Johnny Smith", age: 38, bmi: 27.1 },
+    { name: "Boris Johnson", age: 52, bmi: 30.2 },
   ]);
 
   return (
