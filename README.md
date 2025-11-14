@@ -36,7 +36,6 @@ The system:
 │   │   ├── patientManagementSystem.py
 │   ├── venv/
 │   ├── api_server.py
-│   ├── api.py
 │   ├── main.py
 │   ├── requirements.txt
 │
