@@ -71,7 +71,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-tr from-blue-50 via-white to-purple-50 flex flex-col items-center py-10 px-4">
       {/* Back Button */}
       <div className="w-full max-w-5xl mb-6">
-        <Link href="/">
+        <Link href="/home">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

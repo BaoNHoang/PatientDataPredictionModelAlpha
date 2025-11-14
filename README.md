@@ -50,6 +50,8 @@ The system:
 │   │   │   ├── page.js
 │   │   ├── patients/ 
 │   │   │   ├── page.js
+│   │   ├── home/ 
+│   │   │   ├── page.js
 │   │   ├── favicon.ico
 │   │   ├── globals.css
 │   │   ├── layout.js

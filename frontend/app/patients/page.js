@@ -16,7 +16,7 @@ export default function PatientsPage() {
       
       {/* Back Button */}
       <div className="w-full max-w-5xl mb-6">
-        <Link href="/">
+        <Link href="/home">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
