@@ -45,7 +45,7 @@ def read_all_rows():
     return rows
 
 CSV_PATH = "data/patients.csv"
-CSV_PATH_LABELS = "data/patients.csv"
+CSV_PATH_LABELS = "data/labels.csv"
 CSV_FIELDS = ["patient_id","cholesterol","blood_pressure","age","glucose","bmi"]
 
 system = MainModule(CSV_PATH, CSV_PATH_LABELS)
