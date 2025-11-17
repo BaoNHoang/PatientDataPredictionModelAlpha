@@ -1,6 +1,8 @@
 # api_server.py 
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from utility.patientManagementSystem import MainModule
 from typing import Optional
 import csv
 import math
@@ -22,9 +24,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-CSV_PATH = "data/patients.csv"
-CSV_FIELDS = ["patient_id","cholesterol","blood_pressure","age","glucose","bmi"]
-
 def read_all_rows():
     """Read CSV and return list of dicts with typed values."""
     rows = []
@@ -45,11 +44,37 @@ def read_all_rows():
                 continue
     return rows
 
+CSV_PATH = "data/patients.csv"
+CSV_PATH_LABELS = "data/patients.csv"
+CSV_FIELDS = ["patient_id","cholesterol","blood_pressure","age","glucose","bmi"]
+
+system = MainModule(CSV_PATH, CSV_PATH_LABELS)
+
+class PatientInput(BaseModel):
+    cholesterol: float
+    blood_pressure: float
+    age: float
+    glucose: float
+    bmi: float
+
+@app.post("/predict")
+def predict_disease(patient: PatientInput):
+    new_data = [patient.cholesterol, patient.blood_pressure, patient.age, patient.glucose, patient.bmi]
+
+    disease_names = ["Healthy", "Diabetes", "Heart Disease", "Lung Disease"]
+    predictions = {}
+
+    for year, model in system.models.items():
+        pred = model.predict([new_data])[0]
+        predictions[year] = disease_names[pred]
+
+    return {"predictions": predictions}
+
 @app.get("/patients")
 def get_patients(
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=500),
-    q: Optional[str] = Query(None),             # free text search: patient_id or numeric search
+    q: Optional[str] = Query(None),           
     min_age: Optional[int] = None,
     max_age: Optional[int] = None,
     min_bmi: Optional[float] = None,
@@ -67,7 +92,6 @@ def get_patients(
         if max_bmi is not None and r["bmi"] > max_bmi: return False
         if q:
             ql = q.lower()
-            # if q is numeric, allow numeric matching
             if ql.isdigit():
                 if (str(r["patient_id"]).lower().find(ql) == -1 and
                     str(r["age"]).find(ql) == -1):
