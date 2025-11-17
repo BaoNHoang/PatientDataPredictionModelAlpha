@@ -54,13 +54,13 @@ export default function PatientsPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setViewTable(false)}
-            className={`p-2 rounded-lg ${!viewTable ? "bg-blue-500 text-white" : "bg-white shadow"}`}
+            className={`p-2 rounded-lg ${!viewTable ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-white shadow hover:bg-gray-100"}`}
           >
             <Grid/>
           </button>
           <button
             onClick={() => setViewTable(true)}
-            className={`p-2 rounded-lg ${viewTable ? "bg-blue-500 text-white" : "bg-white shadow"}`}
+            className={`p-2 rounded-lg ${viewTable ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-white shadow hover:bg-gray-100"}`}
           >
             <List/>
           </button>
@@ -104,7 +104,7 @@ export default function PatientsPage() {
 
       {/* Content */}
       <div className="w-full max-w-6xl">
-        {loading && <p className="text-gray-600 mb-4">Loading...</p>}
+        {loading && <p className="text-gray-500 mb-4">Loading...</p>}
 
         {!viewTable ? (
           <div className="grid md:grid-cols-3 gap-6">
@@ -118,10 +118,27 @@ export default function PatientsPage() {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center gap-4 mt-8">
-        <button onClick={() => setPage(prev=>Math.max(1, prev-1))} disabled={page===1} className="p-2 bg-blue-500 rounded-xl"><ChevronLeft/></button>
+      <div className="flex items-center text-gray-700 gap-4 mt-8">
+        {/* Previous Button */}
+        <button
+          onClick={() => setPage(prev => Math.max(1, prev - 1))}
+          disabled={page === 1}
+          className={`p-2 rounded-xl transition ${page === 1 ? "bg-gray-400 cursor-not-allowed opacity-50" : "bg-blue-500 text-white hover:bg-blue-600"}`}
+        >
+          <ChevronLeft />
+        </button>
+
+        {/* Page Indicator */}
         <span>Page {page} / {totalPages}</span>
-        <button onClick={() => setPage(prev=>Math.min(totalPages, prev+1))} disabled={page===totalPages} className="p-2 bg-blue-500 rounded-xl"><ChevronRight/></button>
+
+        {/* Next Button */}
+        <button
+          onClick={() => setPage(prev => Math.min(totalPages, prev + 1))}
+          disabled={page === totalPages}
+          className={`p-2 rounded-xl transition ${page === totalPages ? "bg-gray-400 cursor-not-allowed opacity-50" : "bg-blue-500 text-white hover:bg-blue-600"}`}
+        >
+          <ChevronRight/>
+        </button>
       </div>
     </div>
   );
