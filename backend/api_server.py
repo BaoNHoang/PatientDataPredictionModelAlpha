@@ -33,7 +33,7 @@ def read_all_rows():
         for r in reader:
             try:
                 rows.append({
-                    "patient_id": r["patient_id"],
+                    "patient_id": int(r["patient_id"]),
                     "cholesterol": float(r["cholesterol"]),
                     "blood_pressure": float(r["blood_pressure"]),
                     "age": int(float(r["age"])),
@@ -84,7 +84,10 @@ def get_patients(
         sort_by = "patient_id"
     reverse = (sort_dir.lower() == "desc")
     try:
-        filtered.sort(key=lambda x: x.get(sort_by, 0), reverse=reverse)
+        if sort_by == "patient_id":
+            filtered.sort(key=lambda x: int(x["patient_id"]), reverse=reverse)
+        else:
+            filtered.sort(key=lambda x: float(x[sort_by]), reverse=reverse)
     except Exception:
         pass
 

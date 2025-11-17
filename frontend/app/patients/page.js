@@ -54,17 +54,17 @@ export default function PatientsPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setViewTable(false)}
-            className={`p-2 rounded-lg ${!viewTable ? "bg-blue-600 text-white" : "bg-white shadow"}`}
-            title="Grid"
+            className={`p-2 rounded-lg ${!viewTable ? "bg-blue-500 text-white" : "bg-white shadow"}`}
+            title=""
           >
-            <Grid />
+            <Grid/>
           </button>
           <button
             onClick={() => setViewTable(true)}
-            className={`p-2 rounded-lg ${viewTable ? "bg-blue-600 text-white" : "bg-white shadow"}`}
-            title="Table"
+            className={`p-2 rounded-lg ${viewTable ? "bg-blue-500 text-white" : "bg-white shadow"}`}
+            title=""
           >
-            <List />
+            <List/>
           </button>
         </div>
       </div>
@@ -76,7 +76,7 @@ export default function PatientsPage() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search by patient id, age, etc."
-            className="w-full px-4 py-3 rounded-xl border"
+            className="w-full px-4 py-3 rounded-xl border text-gray-900 placeholder-gray-500 bg-white shadow-sm"
           />
         </div>
 
@@ -100,7 +100,7 @@ export default function PatientsPage() {
             <option value={50}>50</option>
           </select>
 
-          <button onClick={() => load(1)} className="px-4 py-2 bg-blue-600 text-white rounded-xl">Apply</button>
+          {/* <button onClick={() => load(1)} className="px-4 py-2 bg-blue-500 text-white rounded-xl">Apply</button> */}
         </div>
       </div>
 
