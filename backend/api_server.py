@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from utility.patientManagementSystem import MainModule
+import csv
 
 app = FastAPI()
 
@@ -42,3 +43,19 @@ def predict_disease(patient: PatientInput):
         predictions[year] = disease_names[pred]
 
     return {"predictions": predictions}
+
+@app.get("/patients")
+def get_all_patients():
+    patients = []
+    with open("data/patients.csv", "r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            patients.append({
+                "patient_id": row["patient_id"],
+                "cholesterol": float(row["cholesterol"]),
+                "blood_pressure": float(row["blood_pressure"]),
+                "age": int(row["age"]),
+                "glucose": float(row["glucose"]),
+                "bmi": float(row["bmi"])
+            })
+    return {"patients": patients}
