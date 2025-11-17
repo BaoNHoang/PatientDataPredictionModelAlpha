@@ -40,7 +40,6 @@ def read_all_rows():
                     "bmi": float(r["bmi"]),
                 })
             except Exception:
-                # Skip malformed row
                 continue
     return rows
 

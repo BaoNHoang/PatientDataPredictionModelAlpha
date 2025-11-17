@@ -55,14 +55,12 @@ export default function PatientsPage() {
           <button
             onClick={() => setViewTable(false)}
             className={`p-2 rounded-lg ${!viewTable ? "bg-blue-500 text-white" : "bg-white shadow"}`}
-            title=""
           >
             <Grid/>
           </button>
           <button
             onClick={() => setViewTable(true)}
             className={`p-2 rounded-lg ${viewTable ? "bg-blue-500 text-white" : "bg-white shadow"}`}
-            title=""
           >
             <List/>
           </button>

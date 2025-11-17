@@ -1,7 +1,5 @@
 // components/PatientTable.js
 "use client";
-// import Link from "next/link";
-
 export default function PatientTable({ patients }) {
   return (
     <div className="bg-white rounded-xl shadow p-4 overflow-auto">

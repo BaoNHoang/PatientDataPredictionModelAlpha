@@ -1,33 +1,49 @@
 "use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+
+function FloatingDots({ count = 25 }) {
+  const [dots, setDots] = useState([]);
+
+  useEffect(() => {
+    const colors = ["bg-blue-300", "bg-purple-300"]; 
+    const generated = Array.from({ length: count }, () => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      animationDuration: `${6 + Math.random() * 6}s`,
+      animationDelay: `${Math.random() * 4}s`,
+      color: colors[Math.floor(Math.random() * colors.length)], 
+    }));
+    setDots(generated);
+  }, [count]);
+  return (
+    <>
+      {dots.map((dot, i) => (
+        <div key={i} className={`absolute w-2 h-2 rounded-full opacity-40 animate-float ${dot.color}`}
+          style={{
+            left: dot.left,
+            top: dot.top,
+            animationDuration: dot.animationDuration,
+            animationDelay: dot.animationDelay
+            }}/>))}
+    </>
+  );
+}
 
 export default function HomePage() {
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden bg-gradient-to-tr from-blue-100 via-white to-purple-100 px-4">
-
       {/* Background Effects */}
       <div className="absolute inset-0 opacity-30">
         <div className="w-full h-full bg-[linear-gradient(to_right,#87a8ff20_1px,transparent_1px),linear-gradient(to_bottom,#87a8ff20_1px,transparent_1px)] bg-[size:50px_50px] animate-[gridMove_12s_linear_infinite]"></div>
       </div>
 
       <div className="absolute top-20 left-10 w-72 h-72 bg-blue-300 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-
       <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-300 rounded-full blur-3xl opacity-20 animate-pulse"></div>
 
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-blue-300 rounded-full opacity-40 animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDuration: `${6 + Math.random() * 6}s`,
-              animationDelay: `${Math.random() * 4}s`,
-            }}
-          />
-        ))}
+        <FloatingDots/>
       </div>
 
       {/* Main Title */}

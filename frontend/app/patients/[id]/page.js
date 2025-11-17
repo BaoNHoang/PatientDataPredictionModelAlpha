@@ -1,9 +1,8 @@
 import PatientDetailClient from "../../../components/patientDetailClient";
 
 export default async function PatientDetailPage({ params }) {
-  const { id } = await params; // now safe to unwrap
+  const { id } = await params; 
 
-  // Fetch from your FastAPI backend
   const res = await fetch(`http://127.0.0.1:8000/patient/${id}`, {
     cache: "no-store",
   });
