@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from utility.patientManagementSystem import MainModule
+from fastapi import Query
 import csv
 
 app = FastAPI()
@@ -45,17 +46,37 @@ def predict_disease(patient: PatientInput):
     return {"predictions": predictions}
 
 @app.get("/patients")
-def get_all_patients():
-    patients = []
+def get_all_patients(page: int = 1, page_size: int = 50):
+    rows = []
     with open("data/patients.csv", "r") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            patients.append({
-                "patient_id": row["patient_id"],
-                "cholesterol": float(row["cholesterol"]),
-                "blood_pressure": float(row["blood_pressure"]),
-                "age": int(row["age"]),
-                "glucose": float(row["glucose"]),
-                "bmi": float(row["bmi"])
-            })
-    return {"patients": patients}
+            rows.append(row)
+
+    total = len(rows)
+    
+    start = (page - 1) * page_size
+    end = start + page_size
+
+    # Slice rows
+    page_rows = rows[start:end]
+
+    # Convert values
+    patients = []
+    for r in page_rows:
+        patients.append({
+            "patient_id": r["patient_id"],
+            "cholesterol": float(r["cholesterol"]),
+            "blood_pressure": float(r["blood_pressure"]),
+            "age": int(r["age"]),
+            "glucose": float(r["glucose"]),
+            "bmi": float(r["bmi"]),
+        })
+
+    return {
+        "patients": patients,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": (total + page_size - 1) // page_size
+    }
